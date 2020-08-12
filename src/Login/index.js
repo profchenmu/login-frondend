@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import clsx from 'clsx';
 
 import Grid from '@material-ui/core/Grid';
@@ -20,69 +20,135 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Button from '@material-ui/core/Button';
 import logo from './images/jll-logo.svg';
+import axios from 'axios';
+
+import './login.scss';
 
 function Login(props) {
+    console.log(props)
     const classes = loginStyle();
 
     const [values, setValues] = React.useState({
+        username: '',
         password: '',
+
+    });
+    const [passwordDisplay, setShowPasswordValues] = React.useState({
         showPassword: false,
     });
+
+    const [message, setMessage] = React.useState({
+        message: '',
+    });
+    const [disabledValue, setDisabledValue] = React.useState({
+        btnDisabled: false,
+    });
+
+    const displayErrorMsg = (error) => {
+        setMessage({ message: error })
+    };
 
     const handleChange = (prop) => (event) => {
         setValues({ ...values, [prop]: event.target.value });
     };
 
     const handleClickShowPassword = () => {
-        setValues({ ...values, showPassword: !values.showPassword });
+        setShowPasswordValues({ showPassword: !passwordDisplay.showPassword });
+    };
+    const toggleDisabled = (disabled) => {
+        setDisabledValue({ btnDisabled: disabled });
+
     };
 
+    const handleSubmit = () => {
+        toggleDisabled(true)
+        console.log(values)
+        const options = {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+                // 'content-type': 'application/x-www-form-urlencoded'
+            },
+            data: values,
+            url: `/login`,
+        };
+        axios(options).then((res) => {
+
+            if (res.data.code === 1) {
+                props.history.push('/selecter')
+                // window.location.href = 'https://arcg.is/1OH8aS'
+            } else {
+                displayErrorMsg('Invalid Username or Password!')
+            }
+
+
+            // res.redirect('https://arcg.is/1OH8aS')
+        }).catch((err) => {
+            toggleDisabled(false)
+        })
+    };
     const handleMouseDownPassword = (event) => {
         event.preventDefault();
     };
-
     return (
-        <div className={classes.root}>
-            <Paper className={classes.paper}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} sm container>
-                        <img src={logo} className={classes.logo} alt="logo" />
-                        <form className={classes.root} noValidate autoComplete="off">
+        <div className='login-base'>
+            <div className={`login-root ${classes.root}`}>
+                <Paper className={classes.paper}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm container>
+                            <img src={logo} className={classes.logo} alt="logo" />
+                            <form className={classes.root} noValidate autoComplete="off">
 
-                            <TextField fullWidth className={classes.margin} id="standard-basic" label="User Name" />
-
-
-                            <FormControl fullWidth className={clsx(classes.margin, classes.textField)}>
-                                <InputLabel htmlFor="standard-adornment-password">Password</InputLabel>
-                                <Input
-                                    id="standard-adornment-password"
-                                    type={values.showPassword ? 'text' : 'password'}
-                                    value={values.password}
-                                    onChange={handleChange('password')}
-                                    endAdornment={
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                aria-label="toggle password visibility"
-                                                onClick={handleClickShowPassword}
-                                                onMouseDown={handleMouseDownPassword}
-                                            >
-                                                {values.showPassword ? <Visibility /> : <VisibilityOff />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    }
+                                <TextField fullWidth className={classes.margin} id="standard-basic" label="User Name"
+                                    onChange={handleChange('username')}
+                                    onFocus={() => {
+                                        displayErrorMsg(null);
+                                        toggleDisabled(false)
+                                    }}
                                 />
-                            </FormControl>
-                            <Typography align='left'>
-                                <Button size='large' variant="contained" className={classes.marginButton} color="primary">
-                                    Submit
-                                </Button>
-                            </Typography>
 
-                        </form>
+
+                                <FormControl fullWidth className={clsx(classes.margin, classes.textField)}>
+                                    <InputLabel htmlFor="standard-adornment-password">Password</InputLabel>
+                                    <Input
+                                        id="standard-adornment-password"
+                                        type={passwordDisplay.showPassword ? 'text' : 'password'}
+                                        value={values.password}
+                                        onChange={handleChange('password')}
+                                        onFocus={() => {
+                                            displayErrorMsg(null);
+                                            toggleDisabled(false)
+                                        }}
+                                        endAdornment={
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={handleClickShowPassword}
+                                                    onMouseDown={handleMouseDownPassword}
+                                                >
+                                                    {passwordDisplay.showPassword ? <Visibility /> : <VisibilityOff />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        }
+                                    />
+                                    <Typography align='left' className={classes.errorMsg} color='error'>{message.message}</Typography>
+                                </FormControl>
+
+                                <Typography align='left' className={classes.marginButton}>
+                                    <Button size='large' variant="contained" color="primary"
+                                        onClick={handleSubmit}
+                                        disabled={disabledValue.btnDisabled}
+                                    >
+                                        Submit
+                                    </Button>
+                                </Typography>
+
+                            </form>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </Paper>
-        </div >
+                </Paper>
+            </div>
+        </div>
     )
 }
 export default Login;
