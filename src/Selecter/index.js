@@ -29,10 +29,10 @@ function Login(props) {
             <Paper className={classes.paper}>
                 <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
                     <Button>
-                        <a target="blank" href="https://jll.maps.arcgis.com/apps/opsdashboard/index.html#/f1b8a03b2da8482d821d5e159718ea67">BJ Office Market</a>
+                        <a href="https://jll.maps.arcgis.com/apps/opsdashboard/index.html#/f1b8a03b2da8482d821d5e159718ea67">BJ Office Market</a>
                     </Button>
                     <Button>
-                        <a target="blank" href="https://jll.maps.arcgis.com/apps/opsdashboard/index.html#/d7e895dfb67d4ee3911bd98ac5a18281">BJ Office Transactions</a></Button>
+                        <a href="https://jll.maps.arcgis.com/apps/opsdashboard/index.html#/d7e895dfb67d4ee3911bd98ac5a18281">BJ Office Transactions</a></Button>
                 </ButtonGroup>
             </Paper>
         </div>
